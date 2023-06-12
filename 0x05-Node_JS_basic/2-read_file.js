@@ -1,38 +1,30 @@
 const fs = require('fs');
 
 function countStudents(fileName) {
-  const students = {};
-  const fields = {};
-  let length = 0;
-  try {
-    const content = fs.readFileSync(fileName, 'utf-8');
-    const lines = content.toString().split('\n');
-    for (let i = 0; i < lines.length; i += 1) {
-      if (lines[i]) {
-        length += 1;
-        const field = lines[i].toString().split(',');
-        if (Object.prototype.hasOwnProperty.call(students, field[3])) {
-          students[field[3]].push(field[0]);
-        } else {
-          students[field[3]] = [field[0]];
+    try {
+        const data = fs.readFileSync(fileName, 'utf8').split('\n');
+        let count = 0;
+        const fields = {};
+        for (const row of data) {
+        if (row.length > 0) {
+            count += 1;
+            const student = row.split(',');
+            if (!fields[student[3]]) {
+            fields[student[3]] = [];
+            }
+            fields[student[3]].push(student[0]);
         }
-        if (Object.prototype.hasOwnProperty.call(fields, field[3])) {
-          fields[field[3]] += 1;
-        } else {
-          fields[field[3]] = 1;
         }
-      }
+        console.log(`Number of students: ${count}`);
+        for (const field in fields) {
+        if (field) {
+            const list = fields[field];
+            console.log(`Number of students in ${field}: ${list.length}. List: ${list.join(', ')}`);
+        }
+        }
+    } catch (err) {
+        throw new Error('Cannot load the database');
     }
-    const l = length - 1;
-    console.log(`Number of students: ${l}`);
-    for (const [key, value] of Object.entries(fields)) {
-      if (key !== 'field') {
-        console.log(`Number of students in ${key}: ${value}. List: ${students[key].join(', ')}`);
-      }
     }
-  } catch (error) {
-    throw Error('Cannot load the database');
-  }
-}
 
 module.exports = countStudents;
